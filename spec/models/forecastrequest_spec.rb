@@ -94,6 +94,13 @@ describe Forecastrequest do
         hash = Forecastrequest.xml_to_hash('<wlc><wl ts="date1">55</wl><wl ts="date2">56</wl></wlc>')
         hash.should == { "date1" => "55","date2" => "56" }
     end
+
+    
+    it "should convert hash->csv correctly" do
+        hash = { "date1" => "55","date2" => "56" }
+        csv = Forecastrequest.hash_to_csv(hash)
+        csv.should == "date1,55\ndate2,56\n"
+    end
     
   end
   

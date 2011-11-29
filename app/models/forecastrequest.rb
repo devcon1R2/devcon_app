@@ -103,6 +103,15 @@ class Forecastrequest < ActiveRecord::Base
     end
     res = hash
   end
+
+  def self.hash_to_csv(hash)
+    csv = ""
+    hash.each do |key, value| 
+      csv << "#{key},#{value}\n"
+    end
+    csv
+  end
+  
   
 
 
