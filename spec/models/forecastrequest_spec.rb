@@ -80,12 +80,12 @@ describe Forecastrequest do
   
     it "should be correct" do
       fcr = Forecastrequest.new(@attr)
-      hash = { :startdate => DateTime.new(2001, 3, 3, 0, 0, 0),
-               :enddate => DateTime.new(2003, 3, 3, 0, 0, 0),
-               :interval => 15,
-               :wlc => { DateTime.parse('2011-3-4') => 5.0, 
-                         DateTime.parse('2011-3-5') => 6.0, 
-                         DateTime.parse('2011-3-6') => 6.0, }
+      hash = { :startdate => DateTime.new(2001, 3, 3, 0, 0, 0).to_s(:db),
+               :enddate => DateTime.new(2003, 3, 3, 0, 0, 0).to_s(:db),
+               :interval => "15",
+               :wlc => { '2011-3-4' => "5", 
+                         '2011-3-5' => "6", 
+                         '2011-3-6' => "6", }
              }
       fcr.make_hash.should == hash    
     end

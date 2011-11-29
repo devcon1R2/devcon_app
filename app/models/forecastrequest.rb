@@ -36,14 +36,57 @@ class Forecastrequest < ActiveRecord::Base
     datahash = {}
     dataarray.each do |workload|
       wl = workload.split(',')
-      date = DateTime.parse(wl[0])
-      value = wl[1].to_f
-      datahash[date] = value
+      datahash[wl[0]] = wl[1]
     end
-    { :startdate  => self.startdate,
-      :enddate    => self.enddate,
-      :interval   => self.interval,
+    { :startdate  => self.startdate.to_s(:db),
+      :enddate    => self.enddate.to_s(:db),
+      :interval   => self.interval.to_s,
       :wlc        => datahash }
   end
+ 
+
+
+ 
+  def build(hash)
+    require "uri"
+    require "net/http"
+
+    @input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ForecastRequest xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"PredictionEngine\" xmlns:version=\"1.0\">"
+	#startdate:
+	@input = @input + "<startdate>" + hash["startdate"] + "</startdate>"
+	#enddate:
+	@input = @input + "<enddate>" + hash["enddate"] + "</enddate>"
+	#interval of historical- and forecast data:
+	@input = @input + "<forecastinterval>" + hash["interval"].to_s + "</forecastinterval> <historicalinterval>" + hash["interval"].to_s + "</historicalinterval>"
+    #workloadcollection:
+	@input = @input + "<wlc>"
+	if hash != nil
+	  hash.each do |key, value|
+	    if(key != "startdate" && key != "enddate" && key != "interval")
+	      @input = @input + "<wl ts =\"" + key + "\">" + value + "</wl>"
+		end
+	  end
+	  @input = @input + "</wlc> </ForecastRequest>"
+
+      url = URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/')
+      req = Net::HTTP::Post.new(url.path)
+      req['Accept'] = "text/xml"
+      req['Content-Type'] = "text/xml"
+      req.body = @input
+      http = Net::HTTP.new(url.host, url.port)
+      http.set_debug_output($stdout)
+      res = http.start do |x|
+        x.request(req)
+      end
+      case res
+        when Net::HTTPSuccess, Net::HTTPRedirection
+          puts "Created user OK at #{res['Location']}"
+        else
+          res.error!
+      end
+    end 	#if hash != nil
+  end 		#def
+
+
 
 end
