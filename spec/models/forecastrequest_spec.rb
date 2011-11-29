@@ -93,10 +93,18 @@ describe Forecastrequest do
 
  
   describe "test REST-interface" do
+    
+    it "should not accept empty inputs" do
+	  fcr = Forecastrequest.new		 
+      fcr = Forecastrequest.new
+	  fcr.getforecast((nil)).should == "Input is empty"
+	end
+	  
+  
     it "should get a positive response" do
 	  #hash = {:interval => 1440, :startdate => "2012-01-01T00:00:00Z", :enddate => "2012-01-03T00:00:00Z", :2011-12-01T00:00:00Z => "10", :2011-12-02T00:00:00Z => "10", :2011-12-03T00:00:00Z => "10", :2011-12-04T00:00:00Z => "10", :2011-12-05T00:00:00Z => "10", :2011-12-06T00:00:00Z => "10", :2011-12-07T00:00:00Z => "10", :2011-12-08T00:00:00Z => "10"}
-	  hash = { :startdate => DateTime.new(2001, 3, 3, 0, 0, 0).to_s(:db),
-               :enddate => DateTime.new(2003, 3, 3, 0, 0, 0).to_s(:db),
+	  hash = { :startdate => DateTime.new(2012, 1, 1, 0, 0, 0).to_s(:db),
+               :enddate => DateTime.new(2012, 1, 3, 0, 0, 0).to_s(:db),
                :interval => "15",
                :wlc => { '2011-12-01' => "5", 
                          '2011-12-02' => "6", 
@@ -113,7 +121,7 @@ describe Forecastrequest do
 	  fcr = Forecastrequest.new		 
       fcr.make_hash.should == hash    
 	  fcr = Forecastrequest.new(@attr)
-	  fcr.build(hash).should be_successful
+	  
 	end
   end
 

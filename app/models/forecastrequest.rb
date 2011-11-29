@@ -48,12 +48,29 @@ class Forecastrequest < ActiveRecord::Base
 
  
   def getforecast(hash)
-  puts "+++++++++++++++++++++++++"
     require "uri"
     require "net/http"
 	require 'nokogiri'
-	@input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ForecastRequest xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"PredictionEngine\" xmlns:version=\"1.0\">"
-	#startdate:
+	if hash != nil
+	  url = URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/')
+      req = Net::HTTP::Post.new(url.path)
+      req['Accept'] = "text/xml"
+      req['Content-Type'] = "text/xml"
+	  req.body = self.inputcreator(hash)
+	  res = Net::HTTP.start(url.host, url.port) { |http|
+      http.request(req)
+      }
+	  #puts "OUTPUT"
+      #puts res.body
+	  return res.body
+	end
+	return "Input is empty!"
+  end 		#def
+
+
+  def inputcreator(hash)
+    @input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ForecastRequest xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"PredictionEngine\" xmlns:version=\"1.0\">"
+    #startdate
 	@input = @input + "<startdate>" + hash["startdate"] + "</startdate>"
 	#enddate:
 	@input = @input + "<enddate>" + hash["enddate"] + "</enddate>"
@@ -61,37 +78,12 @@ class Forecastrequest < ActiveRecord::Base
 	@input = @input + "<forecastinterval>" + hash["interval"].to_s + "</forecastinterval> <historicalinterval>" + hash["interval"].to_s + "</historicalinterval>"
     #workloadcollection:
 	@input = @input + "<wlc>"
-	if hash != nil
-	  hash.each do |key, value|
-	    if(key != "startdate" && key != "enddate" && key != "interval")
-	      @input = @input + "<wl ts =\"" + key + "\">" + value + "</wl>"
-		end
+	hash.each do |key, value|
+	  if(key != "startdate" && key != "enddate" && key != "interval")
+	    @input = @input + "<wl ts =\"" + key + "\">" + value + "</wl>"
 	  end
-	  @input = @input + "</wlc> </ForecastRequest>"
-
-	  url = URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/')
-      req = Net::HTTP::Post.new(url.path)
-      req['Accept'] = "text/xml"
-      req['Content-Type'] = "text/xml"
-      req.body = @input
-      #http = Net::HTTP.new(url.host, url.port)
-	  #http.set_debug_output($stdout)
-      #res = http.start #do |x|
-  #      result= x.request(req)s
-      #end
-	  res = Net::HTTP.start(url.host, url.port) {|http|
-      http.request(req)
-      }
-	  puts "OUTPUT"
-      puts res.body
-	  return res.body
-
-    	#if hash != nil
-	else
-	  return "BadRequest"
 	end
-  end 		#def
-
-
-
+	@input = @input + "</wlc> </ForecastRequest>"
+	return @input
+  end	
 end
