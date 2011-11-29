@@ -6,15 +6,12 @@ class ForecastrequestsController < ApplicationController
     render 'new'
   end
   
-	
   def create
 	@forecastrequest = Forecastrequest.new(params[:forecastrequest])
 	@forecastrequest.save!
-  @forecastrequest.compute_forecast
-	@forecastrequest.save!
+    
 	render 'show'
-  end
-  
+  end  
   
 
   def destroy

@@ -11,6 +11,8 @@
 #  created_at :datetime
 #  updated_at :datetime
 #
+require "uri"
+require "net/http"
 require 'nokogiri'
 
 class Forecastrequest < ActiveRecord::Base
@@ -39,19 +41,29 @@ class Forecastrequest < ActiveRecord::Base
       wl = workload.split(',')
       datahash[wl[0]] = wl[1]
     end
-    { :startdate  => self.startdate.to_s(:db),
-      :enddate    => self.enddate.to_s(:db),
+    { :startdate  => self.startdate.strftime("%Y-%m-%dT%H:%M:%SZ"),
+      :enddate    => self.enddate..strftime("%Y-%m-%dT%H:%M:%SZ"),
       :interval   => self.interval.to_s,
       :wlc        => datahash }
   end
  
+  
 
-
+  def computeforecast
+    res = getforecast
+    if res == nil
+      self.result = "Invalid input!"
+    elsif res == Net::HTTPSuccess
+      hash = xml_to_hash(res.body)
+      self.result = hash_to_csv(hash)
+    else
+      self.result = res.body
+    end
+  end
  
-  def getforecast(hash)
-    require "uri"
-    require "net/http"
-	require 'nokogiri'
+
+  def getforecast
+    hash = make_hash
 	if hash != nil
 	  url = URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/')
       req = Net::HTTP::Post.new(url.path)
