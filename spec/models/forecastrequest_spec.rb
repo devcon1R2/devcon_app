@@ -103,5 +103,9 @@ describe Forecastrequest do
       fcr.make_hash.should == hash    
     end
   end
+  
+#  describe "test REST-interface" do
+#    hash = {:interval => 1440, :startdate => "2012-01-01T00:00:00Z", :enddate => "2012-01-03T00:00:00Z", }
+#  end
 	
 end

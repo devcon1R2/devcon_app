@@ -50,7 +50,8 @@ class Forecastrequest < ActiveRecord::Base
   def build(hash)
     require "uri"
     require "net/http"
-
+	require 'nokogiri'
+	Rails.logger = Logger.new(STDOUT)
     @input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ForecastRequest xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"PredictionEngine\" xmlns:version=\"1.0\">"
 	#startdate:
 	@input = @input + "<startdate>" + hash["startdate"] + "</startdate>"
@@ -68,19 +69,24 @@ class Forecastrequest < ActiveRecord::Base
 	  end
 	  @input = @input + "</wlc> </ForecastRequest>"
 
-      url = URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/')
+	  url = URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/')
       req = Net::HTTP::Post.new(url.path)
       req['Accept'] = "text/xml"
       req['Content-Type'] = "text/xml"
       req.body = @input
       http = Net::HTTP.new(url.host, url.port)
-      http.set_debug_output($stdout)
+	  http.set_debug_output($stdout)
       res = http.start do |x|
         x.request(req)
       end
-      case res
+	  logger.info("TEST")
+	  case res
         when Net::HTTPSuccess, Net::HTTPRedirection
-          puts "Created user OK at #{res['Location']}"
+	      puts "Created user OK at #{res['Location']}"
+		  doc = Nokogiri::XML(res.body)
+		  puts "#{wl.attribute('ts')}\n"
+          puts "#{wl}\n"
+        
         else
           res.error!
       end
