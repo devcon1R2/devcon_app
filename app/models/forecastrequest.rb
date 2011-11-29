@@ -63,9 +63,9 @@ class Forecastrequest < ActiveRecord::Base
       }
 	  #puts "OUTPUT"
       #puts res.body
-	  return res.body
+	  return res
 	end
-	return "Input is empty!"
+	return nil
   end 		#def
 
 
