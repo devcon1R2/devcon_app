@@ -1,5 +1,5 @@
 <script type="text/javascript" src="../javascripts/datepicker.js"> </script>
-<h1>Forecast request - create</h1>
+<h1><%= injixo_logo %>Forecast request - create</h1>
 
 <%= form_for @forecastrequest,  :multipart => true  do |f| %>
 
@@ -12,33 +12,35 @@
 	</div>
   <div class="field">
     <b>Time range:</b><br />
-    <%= f.text_field :startdate, :size => 10 %>
- <a href="#" onclick="displayDatePicker('forecastrequest[startdate]',this,'mdy','/');"><img src='../images/datepickerpopup.gif'/></a>
+	<%= f.text_field :startdate, :size => 10 %>
+	<%= add_datepicker("startdate") %>
     <%= f.text_field :enddate , :size => 10 %>
- <a href="#" onclick="displayDatePicker('forecastrequest[enddate]',this,'mdy','/');"><img src='../images/datepickerpopup.gif'/></a>
+	<%= add_datepicker("enddate") %>
   </div>
 
-      <div class="field">
+  <div class="field">
     <b>Interval:</b><br />
     <%= f.radio_button :interval, "15"  %>15 Minutes<br/>
     <%= f.radio_button :interval, "30"  %>30 Minutes<br/>
     <%= f.radio_button :interval, "60"  %>60 Minutes<br/>
   </div>
-  </td>
-  <td class = "round dataarea"width=350>
-      <div class="field">
-  <b>Historical data:</b><br />
-  <%= f.text_area :data %>
-</div>
-
-  <div class="actions">
-    <%= f.submit "Submit" %>
-  </div>
-  </td>
-<td class = "round dataarea" width=350>
-  <b>Result:</b>
 </td>
-  </table>
+  <td class = "round dataarea"width=350>
+    <div class="field">
+      <b>Historical data:</b><br />
+      <%= f.text_area :data %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "Submit" %>
+    </div>
+  </td>
+  <td class = "round dataarea" width=350>
+    <b>Result:</b><br />
+	Press submit to send the historical data to the Prediction Engine. 
+	The PE will generate a forecast based on the given data and return this data.
+  </td>
+</table>
   
 <% end %>
 

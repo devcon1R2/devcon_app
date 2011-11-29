@@ -33,7 +33,10 @@ class Forecastrequest < ActiveRecord::Base
   
   
   def make_hash
-    dataarray = self.data.split("\n")
+    mydata = self.data
+	mydata.gsub!("\r","")
+	mydata.gsub!("\t",",")
+	dataarray = mydata.split("\n")
     datahash = {}
     dataarray.each do |workload|
       wl = workload.split(',')

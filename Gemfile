@@ -3,9 +3,6 @@ source 'http://rubygems.org'
 gem 'rails', '3.0.11'
 gem 'sqlite3', '1.3.3'
 
-#gem 'rmagick'
-#gem 'imagemagick'
-#gem 'gruff'
 
 group :development do
   gem 'rspec-rails', '2.6.1'

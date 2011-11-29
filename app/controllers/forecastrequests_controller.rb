@@ -1,6 +1,5 @@
 class ForecastrequestsController < ApplicationController
-
-
+  
   def new
     @forecastrequest = Forecastrequest.new
     render 'new'

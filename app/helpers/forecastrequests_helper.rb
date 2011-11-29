@@ -1,15 +1,13 @@
 module ForecastrequestsHelper
 
+def add_datepicker(name)
+    img = image_tag('datepickerpopup.gif', :alt => "DatePicker")
+	link_to img, "#", :onclick => "displayDatePicker('forecastrequest[#{name}]',this,'mdy','/');"
+end#def
 
+def injixo_logo
+    img = image_tag('injixo.jpg')
+	link_to img, "http://www.injixo.com"
+end#def
 
-# def createGraph(arr, requestid)
-  # g = Gruff::Line.new
-  # g.title = "Result" 
-
-# g.data("Forecast", arr)
-
-# g.labels = {0 => 'test'}
-
-# g.write(requestid + '.png') 
-# end#def createGraph
 end
