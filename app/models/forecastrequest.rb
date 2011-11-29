@@ -36,13 +36,11 @@ class Forecastrequest < ActiveRecord::Base
     datahash = {}
     dataarray.each do |workload|
       wl = workload.split(',')
-      date = DateTime.parse(wl[0])
-      value = wl[1].to_f
-      datahash[date] = value
+      datahash[wl[0]] = wl[1]
     end
-    { :startdate  => self.startdate,
-      :enddate    => self.enddate,
-      :interval   => self.interval,
+    { :startdate  => self.startdate.to_s(:db),
+      :enddate    => self.enddate.to_s(:db),
+      :interval   => self.interval.to_s,
       :wlc        => datahash }
   end
  
