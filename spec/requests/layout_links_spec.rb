@@ -9,6 +9,6 @@ describe "LayoutLinks" do
   
   it "should have a forecastrequest new page at '/forecast'" do
     get '/forecast'
-    response.should have_selector('h1', :content => "New forecastrequest")
+    response.should have_selector('h1', :content => "Forecast request - create")
   end
 end#describe layout links

@@ -1,0 +1,18 @@
+<p>
+  <b>Email:</b><br/>
+  <input type="text" value="<%=@forecastrequest.email%>" readonly/> 
+</p>
+
+<p>
+  <b>Time range:</b><br/>
+  <input type="text" value="<%=@forecastrequest.startdate%>" size=10 readonly/> <img src='images/datepickerpopup.gif'/>
+  <input type="text" value="<%=@forecastrequest.enddate%>" size=10 readonly/> <img src='images/datepickerpopup.gif'/>
+</p>
+
+
+<p>
+  <b>Interval:</b><br />
+  <input type="radio" <%= "checked" if (@forecastrequest.interval == 15) %> disabled /> 15 Minutes<br />
+  <input type="radio" <%= "checked" if (@forecastrequest.interval == 30) %> disabled /> 30 Minutes<br />
+  <input type="radio" <%= "checked" if (@forecastrequest.interval == 60) %> disabled /> 60 Minutes<br />
+</p>

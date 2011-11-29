@@ -20,8 +20,7 @@ class Forecastrequest < ActiveRecord::Base
   
   
   validates :email, :presence => true,
-				    :format => { :with => email_regex },
-            :uniqueness => { :case_sensitive => false }
+				    :format => { :with => email_regex } #,:uniqueness => { :case_sensitive => false }
             
   validates :startdate, :presence => true
   
@@ -30,6 +29,7 @@ class Forecastrequest < ActiveRecord::Base
   validates :interval, :presence => true
   
   validates :data, :presence => true
+  
   
   def make_hash
     dataarray = self.data.split("\n")

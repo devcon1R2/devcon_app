@@ -1,30 +1,18 @@
+<h1>Forecast request - result</h1>
 <p id="notice"><%= notice %></p>
 
-<p>
-  <b>Email:</b>
-  <%= @forecastrequest.email %>
-</p>
+<table class="results">
+<tr>
+<td class = "round dataarea" width=350>
+  <%= render 'showinput' %>
+</td>
+<td class = "round dataarea" width=350>
+  <%= render 'showinpdata' %>
+</td>
+<td class = "round dataarea" width=350>
+  <%= render 'showoutputdata' %>
+</td>
+</tr>
+</table>
 
-<p>
-  <b>Startdate:</b>
-  <%= @forecastrequest.startdate %>
-</p>
-
-<p>
-  <b>Enddate:</b>
-  <%= @forecastrequest.enddate %>
-</p>
-
-<p>
-  <b>Interval:</b>
-  <%= @forecastrequest.interval %>
-</p>
-
-<p>
-  <b>Data:</b>
-  <%= @forecastrequest.data %>
-</p>
-
-
-<%= link_to 'Edit', edit_forecastrequest_path(@forecastrequest) %> |
 <%= link_to 'Back', forecastrequests_path %>
