@@ -88,7 +88,7 @@ class Forecastrequest < ActiveRecord::Base
 
     	#if hash != nil
 	else
-	  return nil
+	  return "BadRequest"
 	end
   end 		#def
 
