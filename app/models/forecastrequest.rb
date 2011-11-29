@@ -45,7 +45,7 @@ class Forecastrequest < ActiveRecord::Base
       datahash[wl[0]] = wl[1]
     end
     { :startdate  => self.startdate.strftime("%Y-%m-%dT%H:%M:%SZ"),
-      :enddate    => self.enddate..strftime("%Y-%m-%dT%H:%M:%SZ"),
+      :enddate    => self.enddate.strftime("%Y-%m-%dT%H:%M:%SZ"),
       :interval   => self.interval.to_s,
       :wlc        => datahash }
   end
@@ -56,11 +56,13 @@ class Forecastrequest < ActiveRecord::Base
     res = getforecast
     if res == nil
       self.result = "Invalid input!"
-    elsif res == Net::HTTPSuccess
-      hash = xml_to_hash(res.body)
-      self.result = hash_to_csv(hash)
-    else
-      self.result = res.body
+    #elsif res == Net::HTTPSuccess
+	else
+      self.result = res.body.gsub('<wl ts="',"").gsub('">',", ").gsub('</wl>',"\n")
+	  #hash = Forecastrequest.xml_to_hash(res.body)
+      #self.result = hash #Forecastrequest.hash_to_csv(hash)
+    #else
+    #  self.result += res.body
     end
   end
  
@@ -86,12 +88,14 @@ class Forecastrequest < ActiveRecord::Base
 
 
   def self.xml_to_hash(xml)
-    hash ={} 
+    #hash ={} 
+	res=""
     doc = Nokogiri::XML(xml)
     doc.xpath('//wl').each do |wl|
-      hash["#{wl.attribute('ts')}"] = "#{wl.content}"
+      #hash["#{wl.attribute('ts')}"] = "#{wl.content}"
+	  res << "#{wl.attribute('ts')},#{wl.content}\n"
     end
-    res = hash
+    return res #hash
   end
 
   def self.hash_to_csv(hash)
@@ -99,7 +103,7 @@ class Forecastrequest < ActiveRecord::Base
     hash.each do |key, value| 
       csv << "#{key},#{value}\n"
     end
-    csv
+    return csv
   end
   
   
@@ -109,17 +113,18 @@ class Forecastrequest < ActiveRecord::Base
   def inputcreator(hash)
     @input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ForecastRequest xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"PredictionEngine\" xmlns:version=\"1.0\">"
     #startdate
-	@input = @input + "<startdate>" + hash["startdate"] + "</startdate>"
+	@input = @input + "<startdate>" + hash[:startdate] + "</startdate>"
 	#enddate:
-	@input = @input + "<enddate>" + hash["enddate"] + "</enddate>"
+	@input = @input + "<enddate>" + hash[:enddate] + "</enddate>"
 	#interval of historical- and forecast data:
-	@input = @input + "<forecastinterval>" + hash["interval"].to_s + "</forecastinterval> <historicalinterval>" + hash["interval"].to_s + "</historicalinterval>"
+	@input = @input + "<forecastinterval>" + hash[:interval].to_s + "</forecastinterval> <historicalinterval>" + hash[:interval].to_s + "</historicalinterval>"
     #workloadcollection:
 	@input = @input + "<wlc>"
-	hash.each do |key, value|
-	  if(key != "startdate" && key != "enddate" && key != "interval")
+	
+	hash[:wlc].each do |key, value|
+#	  if(key != :startdate && key != :enddate && key != :interval)
 	    @input = @input + "<wl ts =\"" + key + "\">" + value + "</wl>"
-	  end
+#	  end
 	end
 	@input = @input + "</wlc> </ForecastRequest>"
 	return @input
