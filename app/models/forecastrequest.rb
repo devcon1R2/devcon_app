@@ -90,21 +90,6 @@ class Forecastrequest < ActiveRecord::Base
   end 		#def
 
 
-=begin
-      uri = URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/')
 
-# Shortcut
-      response = Net::HTTP.post_form(uri, {"q" => "My query", "per_page" => "50"})
 
-# Full control
-      http = Net::HTTP.new(uri.host, uri.port)
-
-      request = Net::HTTP::Post.new(uri.request_uri)
-      request.set_form_data({"q" => "My query", "per_page" => "50"})
-
-      response = http.request(request)
-	end
-
-  end
-=end
 end
