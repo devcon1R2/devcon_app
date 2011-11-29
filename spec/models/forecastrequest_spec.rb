@@ -70,20 +70,7 @@ describe Forecastrequest do
       invalid_email_Forecastrequest.should_not be_valid
     end	  
   end
-  
-  it "should reject duplicate email addresses" do
-    # Put a Forecastrequest with given email address into the database.
-    Forecastrequest.create!(@attr)
-    Forecastrequest_with_duplicate_email = Forecastrequest.new(@attr)
-    Forecastrequest_with_duplicate_email.should_not be_valid
-  end
-  
-  it "should reject email addresses identical up to case" do
-    upcased_email = @attr[:email].upcase
-    Forecastrequest.create!(@attr.merge(:email => upcased_email))
-    Forecastrequest_with_duplicate_email = Forecastrequest.new(@attr)
-    Forecastrequest_with_duplicate_email.should_not be_valid
-  end
+
 	
   it "should reject invalid data" do
     #to be implemented 

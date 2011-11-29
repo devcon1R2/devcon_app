@@ -1,40 +1,45 @@
 <script type="text/javascript" src="../javascripts/datepicker.js"> </script>
-<h1>New forecastrequest</h1>
+<h1>Forecast request - create</h1>
 
-<%= form_for("@forecastrequest") do |f| %>
+<%= form_for @forecastrequest,  :multipart => true  do |f| %>
 
+<table class="results">
+<tr>
+<td class = "round dataarea" width=350>
   <div class="field">
-    <%= f.label :email %><br />
+    <b>Email:</b><br />
     <%= f.text_field :email %>
 	</div>
   <div class="field">
-    <%= f.label :startdate %><br />
-    <%= f.text_field :startdate %>
-   <input type=button value="select" onclick="displayDatePicker('@forecastrequest[startdate]',this);">
-   <!-- <input type=button value="select" onclick="displayDatePicker('startdate', false, 'dmy', '.');">-->
-  </div>
-
-    <div class="field">
-    <%= f.label :enddate %><br />
-    <%= f.text_field :enddate %>
-   <input type=button value="select" onclick="displayDatePicker('@forecastrequest[enddate]',this);">
-   <!-- <input type=button value="select" onclick="displayDatePicker('startdate', false, 'dmy', '.');">-->
+    <b>Time range:</b><br />
+    <%= f.text_field :startdate, :size => 10 %>
+ <a href="#" onclick="displayDatePicker('forecastrequest[startdate]',this,'mdy','/');"><img src='images/datepickerpopup.gif'/></a>
+    <%= f.text_field :enddate , :size => 10 %>
+ <a href="#" onclick="displayDatePicker('forecastrequest[enddate]',this,'mdy','/');"><img src='images/datepickerpopup.gif'/></a>
   </div>
 
       <div class="field">
-    <%= f.label :interval %><br />
-    <%= f.radio_button :interval, "15"  %>15 Minutes
-    <%= f.radio_button :interval, "30"  %>30 Minutes
-    <%= f.radio_button :interval, "60"  %>60 Minutes
+    <b>Interval:</b><br />
+    <%= f.radio_button :interval, "15"  %>15 Minutes<br/>
+    <%= f.radio_button :interval, "30"  %>30 Minutes<br/>
+    <%= f.radio_button :interval, "60"  %>60 Minutes<br/>
   </div>
+  </td>
+  <td class = "round dataarea"width=350>
       <div class="field">
-  <%= f.label :data %> 
-  <%= f.file_field 'data' %></p>
+  <b>Historical data:</b><br />
+  <%= f.text_area :data %>
 </div>
 
   <div class="actions">
     <%= f.submit "Submit" %>
   </div>
+  </td>
+<td class = "round dataarea" width=350>
+  <b>Result:</b>
+</td>
+  </table>
+  
 <% end %>
 
 <%= link_to 'Back', root_path %>
