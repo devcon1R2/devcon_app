@@ -74,10 +74,5 @@ class ForecastrequestsController < ApplicationController
   def destroy
     @forecastrequest = Forecastrequest.find(params[:id])
     @forecastrequest.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(forecastrequests_url) }
-      format.xml  { head :ok }
-    end
   end
 end
