@@ -67,8 +67,6 @@ class Forecastrequest < ActiveRecord::Base
 		end
 	  end
 	  @input = @input + "</wlc> </ForecastRequest>"
-# 	  x = Net::HTTP.post_form(URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/'), @input)
-#      puts x.body
 
       url = URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/')
       req = Net::HTTP::Post.new(url.path)
