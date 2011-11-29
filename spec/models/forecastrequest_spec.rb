@@ -13,7 +13,7 @@
 #
 
 require 'spec_helper'
-
+require "net/http"
 describe Forecastrequest do
   
   
@@ -25,7 +25,7 @@ describe Forecastrequest do
               :data => "2011-3-4,5\n2011-3-5,6\n2011-3-6,6"
 	  }
   end
-  
+ 
   it "should create a new instance given valid attributes" do
     Forecastrequest.create!(@attr)
   end
@@ -103,9 +103,68 @@ describe Forecastrequest do
     end
     
   end
+
+ 
+  describe "test REST-interface" do
+    
+    it "should not accept empty inputs" do
+	  fcr = Forecastrequest.new		 
+      fcr = Forecastrequest.new
+	  @output = fcr.getforecast((nil))
+	  #puts "\n" + @output
+	  @output.should be_nil
+	end
+	  
   
-#  describe "test REST-interface" do
-#    hash = {:interval => 1440, :startdate => "2012-01-01T00:00:00Z", :enddate => "2012-01-03T00:00:00Z", }
-#  end
-	
+    it "should get a positive response" do
+	  hash = {}
+	  hash['interval'] = "1440"
+	  hash['startdate'] = '2012-01-01T00:00:00Z'
+	  hash['enddate'] = '2012-01-03T00:00:00Z'
+	  hash['2011-12-01T00:00:00Z'] = "10"
+	  hash['2011-12-02T00:00:00Z'] = "10"
+	  hash['2011-12-03T00:00:00Z'] = "10"
+	  hash['2011-12-04T00:00:00Z'] = "10"
+	  hash['2011-12-05T00:00:00Z'] = "10"
+	  hash['2011-12-06T00:00:00Z'] = "10"
+	  hash['2011-12-07T00:00:00Z'] = "10"
+	  hash['2011-12-08T00:00:00Z'] = "10"
+	 
+	  fcr = Forecastrequest.new		 
+ #     fcr.make_hash.should == hash    
+	  #fcr = Forecastrequest.new(@attr)
+	  @output = fcr.getforecast(hash)
+	  case @output
+        when Net::HTTPSuccess
+          "1".should == "1"
+        else
+          "1".should == "0"
+      end
+	end 
+  end
+
+  
 end
+
+
+
+
+
+
+
+=begin	  hash = { :startdate => DateTime.new(2012, 1, 1, 0, 0, 0).to_s(:db),
+               :enddate => DateTime.new(2012, 1, 3, 0, 0, 0).to_s(:db),
+               :interval => "15",
+               :wlc => { '2011-12-01' => "5", 
+                         '2011-12-02' => "6", 
+                         '2011-12-03' => "6", 
+						 '2011-12-04' => "6", 
+						 '2011-12-05' => "6", 
+						 '2011-12-06' => "6", 
+						 '2011-12-07' => "6", 
+						 '2011-12-08' => "6", 
+						 '2011-12-09' => "6", 
+						 '2011-12-10' => "6", 
+						 }
+             }
+=end

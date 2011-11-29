@@ -11,6 +11,8 @@
 #  created_at :datetime
 #  updated_at :datetime
 #
+require "uri"
+require "net/http"
 require 'nokogiri'
 
 class Forecastrequest < ActiveRecord::Base
@@ -42,60 +44,45 @@ class Forecastrequest < ActiveRecord::Base
       wl = workload.split(',')
       datahash[wl[0]] = wl[1]
     end
-    { :startdate  => self.startdate.to_s(:db),
-      :enddate    => self.enddate.to_s(:db),
+    { :startdate  => self.startdate.strftime("%Y-%m-%dT%H:%M:%SZ"),
+      :enddate    => self.enddate..strftime("%Y-%m-%dT%H:%M:%SZ"),
       :interval   => self.interval.to_s,
       :wlc        => datahash }
   end
  
+  
 
-
+  def computeforecast
+    res = getforecast
+    if res == nil
+      self.result = "Invalid input!"
+    elsif res == Net::HTTPSuccess
+      hash = xml_to_hash(res.body)
+      self.result = hash_to_csv(hash)
+    else
+      self.result = res.body
+    end
+  end
  
-  def build(hash)
-    require "uri"
-    require "net/http"
-	require 'nokogiri'
-	Rails.logger = Logger.new(STDOUT)
-    @input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ForecastRequest xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"PredictionEngine\" xmlns:version=\"1.0\">"
-	#startdate:
-	@input = @input + "<startdate>" + hash["startdate"] + "</startdate>"
-	#enddate:
-	@input = @input + "<enddate>" + hash["enddate"] + "</enddate>"
-	#interval of historical- and forecast data:
-	@input = @input + "<forecastinterval>" + hash["interval"].to_s + "</forecastinterval> <historicalinterval>" + hash["interval"].to_s + "</historicalinterval>"
-    #workloadcollection:
-	@input = @input + "<wlc>"
-	if hash != nil
-	  hash.each do |key, value|
-	    if(key != "startdate" && key != "enddate" && key != "interval")
-	      @input = @input + "<wl ts =\"" + key + "\">" + value + "</wl>"
-		end
-	  end
-	  @input = @input + "</wlc> </ForecastRequest>"
 
+  def getforecast
+    hash = make_hash
+	if hash != nil
 	  url = URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/')
       req = Net::HTTP::Post.new(url.path)
       req['Accept'] = "text/xml"
       req['Content-Type'] = "text/xml"
-      req.body = @input
-      http = Net::HTTP.new(url.host, url.port)
-	  http.set_debug_output($stdout)
-      res = http.start do |x|
-        x.request(req)
-      end
-	  logger.info("TEST")
-	  case res
-        when Net::HTTPSuccess, Net::HTTPRedirection
-	      puts "Created user OK at #{res['Location']}"
-		  doc = Nokogiri::XML(res.body)
-		  puts "#{wl.attribute('ts')}\n"
-          puts "#{wl}\n"
-        
-        else
-          res.error!
-      end
-    end 	#if hash != nil
+	  req.body = self.inputcreator(hash)
+	  res = Net::HTTP.start(url.host, url.port) { |http|
+      http.request(req)
+      }
+	  #puts "OUTPUT"
+      #puts res.body
+	  return res
+	end
+	return nil
   end 		#def
+
 
 
   def self.xml_to_hash(xml)
@@ -117,5 +104,25 @@ class Forecastrequest < ActiveRecord::Base
   
   
 
+
+
+  def inputcreator(hash)
+    @input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ForecastRequest xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"PredictionEngine\" xmlns:version=\"1.0\">"
+    #startdate
+	@input = @input + "<startdate>" + hash["startdate"] + "</startdate>"
+	#enddate:
+	@input = @input + "<enddate>" + hash["enddate"] + "</enddate>"
+	#interval of historical- and forecast data:
+	@input = @input + "<forecastinterval>" + hash["interval"].to_s + "</forecastinterval> <historicalinterval>" + hash["interval"].to_s + "</historicalinterval>"
+    #workloadcollection:
+	@input = @input + "<wlc>"
+	hash.each do |key, value|
+	  if(key != "startdate" && key != "enddate" && key != "interval")
+	    @input = @input + "<wl ts =\"" + key + "\">" + value + "</wl>"
+	  end
+	end
+	@input = @input + "</wlc> </ForecastRequest>"
+	return @input
+  end	
 
 end
