@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111129082526) do
+ActiveRecord::Schema.define(:version => 20111129154808) do
 
   create_table "forecastrequests", :force => true do |t|
     t.string   "email"
@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(:version => 20111129082526) do
     t.string   "data"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "result"
   end
 
 end
