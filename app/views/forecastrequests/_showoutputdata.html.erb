@@ -1,1 +1,1 @@
-<p>  <b>Result:</b><br />  <textarea rows=15>Result</textarea><br />  <a href="#">Send to email address</a></p>
+<p>  <b>Result:</b><br />  <textarea rows=15 cols=27><%=@forecastrequest.result%></textarea><br />  <a href="mailto:<%=@forecastrequest.email%>?subject='Forecast created from <%=@forecastrequest.startdate%> to <%=@forecastrequest.enddate%>'&body=<%=CGI.escape(@forecastrequest.result || " ")%>">Send to email address</a></p>

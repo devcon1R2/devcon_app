@@ -15,7 +15,7 @@ require 'nokogiri'
 
 class Forecastrequest < ActiveRecord::Base
 
-  attr_accessible :email, :startdate, :enddate, :interval, :data, :result
+  attr_accessible :email, :startdate, :enddate, :interval, :data
   
   email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
   
@@ -48,12 +48,12 @@ class Forecastrequest < ActiveRecord::Base
 
 
  
-  def getforecast(hash)
-  puts "+++++++++++++++++++++++++"
+  def build(hash)
     require "uri"
     require "net/http"
 	require 'nokogiri'
-	@input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ForecastRequest xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"PredictionEngine\" xmlns:version=\"1.0\">"
+	Rails.logger = Logger.new(STDOUT)
+    @input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ForecastRequest xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"PredictionEngine\" xmlns:version=\"1.0\">"
 	#startdate:
 	@input = @input + "<startdate>" + hash["startdate"] + "</startdate>"
 	#enddate:
@@ -75,26 +75,27 @@ class Forecastrequest < ActiveRecord::Base
       req['Accept'] = "text/xml"
       req['Content-Type'] = "text/xml"
       req.body = @input
-      #http = Net::HTTP.new(url.host, url.port)
-	  #http.set_debug_output($stdout)
-      #res = http.start #do |x|
-  #      result= x.request(req)s
-      #end
-	  res = Net::HTTP.start(url.host, url.port) {|http|
-      http.request(req)
-      }
-	  puts "OUTPUT"
-      puts res.body
-	  return res.body
-
-    	#if hash != nil
-	else
-	  return "BadRequest"
-	end
+      http = Net::HTTP.new(url.host, url.port)
+	  http.set_debug_output($stdout)
+      res = http.start do |x|
+        x.request(req)
+      end
+	  logger.info("TEST")
+	  case res
+        when Net::HTTPSuccess, Net::HTTPRedirection
+	      puts "Created user OK at #{res['Location']}"
+		  doc = Nokogiri::XML(res.body)
+		  puts "#{wl.attribute('ts')}\n"
+          puts "#{wl}\n"
+        
+        else
+          res.error!
+      end
+    end 	#if hash != nil
   end 		#def
 
 
-  def self.xml_to_hash(xml)
+  def xml_to_hash(xml)
     hash ={} 
     doc = Nokogiri::XML(xml)
     doc.xpath('//wl').each do |wl|
@@ -103,7 +104,7 @@ class Forecastrequest < ActiveRecord::Base
     res = hash
   end
 
-  def self.hash_to_csv(hash)
+  def hash_to_csv(hash)
     csv = ""
     hash.each do |key, value| 
       csv << "#{key},#{value}\n"

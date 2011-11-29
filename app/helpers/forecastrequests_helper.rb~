@@ -1,0 +1,32 @@
+module ForecastrequestsHelper
+
+
+  def xml_to_hash(xml)
+    hash ={} 
+    doc = Nokogiri::XML(xml)
+    doc.xpath('//wl').each do |wl|
+      hash["#{wl.attribute('ts')}"] = "#{wl.content}"
+    end
+    res = hash
+  end
+
+  def hash_to_csv(hash)
+    csv = ""
+    hash.each do |key, value| 
+      csv << "#{key},#{value}\n"
+    end
+    csv
+  end
+  
+
+# def createGraph(arr, requestid)
+  # g = Gruff::Line.new
+  # g.title = "Result" 
+
+# g.data("Forecast", arr)
+
+# g.labels = {0 => 'test'}
+
+# g.write(requestid + '.png') 
+# end#def createGraph
+end
