@@ -1,5 +1,40 @@
+<script type="text/javascript" src="../javascripts/datepicker.js"> </script>
 <h1>New forecastrequest</h1>
 
-<%= render 'form' %>
+<%= form_for("@forecastrequest") do |f| %>
 
-<%= link_to 'Back', forecastrequests_path %>
+  <div class="field">
+    <%= f.label :email %><br />
+    <%= f.text_field :email %>
+	</div>
+  <div class="field">
+    <%= f.label :startdate %><br />
+    <%= f.text_field :startdate %>
+   <input type=button value="select" onclick="displayDatePicker('@forecastrequest[startdate]',this);">
+   <!-- <input type=button value="select" onclick="displayDatePicker('startdate', false, 'dmy', '.');">-->
+  </div>
+
+    <div class="field">
+    <%= f.label :enddate %><br />
+    <%= f.text_field :enddate %>
+   <input type=button value="select" onclick="displayDatePicker('@forecastrequest[enddate]',this);">
+   <!-- <input type=button value="select" onclick="displayDatePicker('startdate', false, 'dmy', '.');">-->
+  </div>
+
+      <div class="field">
+    <%= f.label :interval %><br />
+    <%= f.radio_button :interval, "15"  %>15 Minutes
+    <%= f.radio_button :interval, "30"  %>30 Minutes
+    <%= f.radio_button :interval, "60"  %>60 Minutes
+  </div>
+      <div class="field">
+  <%= f.label :data %> 
+  <%= f.file_field 'data' %></p>
+</div>
+
+  <div class="actions">
+    <%= f.submit "Submit" %>
+  </div>
+<% end %>
+
+<%= link_to 'Back', root_path %>
