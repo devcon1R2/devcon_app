@@ -45,17 +45,21 @@ class Forecastrequest < ActiveRecord::Base
       :interval   => self.interval,
       :wlc        => datahash }
   end
-  
+ 
+
+
+ 
   def build(hash)
-    #ContentType => "text/xml"
-    #:input = 
-	@input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ForecastRequest xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"PredictionEngine\" xmlns:version=\"1.0\">"
+    require "uri"
+    require "net/http"
+
+    @input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ForecastRequest xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"PredictionEngine\" xmlns:version=\"1.0\">"
 	#startdate:
-	@input = @input + "<startdate>" + startdate + "</startdate>"
+	@input = @input + "<startdate>" + hash["startdate"] + "</startdate>"
 	#enddate:
-	@input = @input + "<enddate>" + enddate + "</enddate>"
+	@input = @input + "<enddate>" + hash["enddate"] + "</enddate>"
 	#interval of historical- and forecast data:
-	@input = @input + "<forecastinterval>" + interval + "</forecastinterval> <historicalinterval>" + interval + "</historicalinterval>"
+	@input = @input + "<forecastinterval>" + hash["interval"].to_s + "</forecastinterval> <historicalinterval>" + hash["interval"].to_s + "</historicalinterval>"
     #workloadcollection:
 	@input = @input + "<wlc>"
 	if hash != nil
@@ -64,14 +68,45 @@ class Forecastrequest < ActiveRecord::Base
 	      @input = @input + "<wl ts =\"" + key + "\">" + value + "</wl>"
 		end
 	  end
-	
 	  @input = @input + "</wlc> </ForecastRequest>"
-	  x = Net::HTTP.post_form(URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/'), @input)
-      puts x.body
-	end
-#	base_uri 'http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/'
-#	options = { :query => {:status => text}}
-#    self.class.post(input, options)
-  end
+# 	  x = Net::HTTP.post_form(URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/'), @input)
+#      puts x.body
 
+      url = URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/')
+      req = Net::HTTP::Post.new(url.path)
+      req['Accept'] = "text/xml"
+      req['Content-Type'] = "text/xml"
+      req.body = @input
+      http = Net::HTTP.new(url.host, url.port)
+      http.set_debug_output($stdout)
+      res = http.start do |x|
+        x.request(req)
+      end
+      case res
+        when Net::HTTPSuccess, Net::HTTPRedirection
+          puts "Created user OK at #{res['Location']}"
+        else
+          res.error!
+      end
+    end 	#if hash != nil
+  end 		#def
+
+
+=begin
+      uri = URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/')
+
+# Shortcut
+      response = Net::HTTP.post_form(uri, {"q" => "My query", "per_page" => "50"})
+
+# Full control
+      http = Net::HTTP.new(uri.host, uri.port)
+
+      request = Net::HTTP::Post.new(uri.request_uri)
+      request.set_form_data({"q" => "My query", "per_page" => "50"})
+
+      response = http.request(request)
+	end
+
+  end
+=end
 end
