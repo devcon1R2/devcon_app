@@ -57,11 +57,10 @@ class Forecastrequest < ActiveRecord::Base
     if res == nil
       self.result = "Invalid input!"
     #elsif res == Net::HTTPSuccess
-	else
-      self.result = res.body.gsub('<wl ts="',"").gsub('">',", ").gsub('</wl>',"\n")
 	  #hash = Forecastrequest.xml_to_hash(res.body)
       #self.result = hash #Forecastrequest.hash_to_csv(hash)
-    #else
+	else
+      self.result = Forecastrequest.ownxmlparser(res.body)
     #  self.result += res.body
     end
   end
@@ -85,17 +84,23 @@ class Forecastrequest < ActiveRecord::Base
 	return nil
   end 		#def
 
-
+  #As the xml parser seems to have problems, own xml parser is used as a workaround
+  def  self.ownxmlparser(xmlstr)
+    if xmlstr.index("<wlc")
+	  return xmlstr.slice(xmlstr.index("<wlc")+5,xmlstr.length).gsub('</wlc></Forecast>',"").gsub('<wl ts="',"").gsub('">',"\t").gsub('</wl>',"\n")
+    else  
+	  return xmlstr
+	end#if  
+  end#def
+  
 
   def self.xml_to_hash(xml)
-    #hash ={} 
-	res=""
+    hash ={} 
     doc = Nokogiri::XML(xml)
     doc.xpath('//wl').each do |wl|
-      #hash["#{wl.attribute('ts')}"] = "#{wl.content}"
-	  res << "#{wl.attribute('ts')},#{wl.content}\n"
+      hash["#{wl.attribute('ts')}"] = "#{wl.content}"
     end
-    return res #hash
+    return hash
   end
 
   def self.hash_to_csv(hash)
