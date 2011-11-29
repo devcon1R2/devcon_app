@@ -45,5 +45,33 @@ class Forecastrequest < ActiveRecord::Base
       :interval   => self.interval,
       :wlc        => datahash }
   end
+  
+  def build(hash)
+    #ContentType => "text/xml"
+    #:input = 
+	@input = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ForecastRequest xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"PredictionEngine\" xmlns:version=\"1.0\">"
+	#startdate:
+	@input = @input + "<startdate>" + startdate + "</startdate>"
+	#enddate:
+	@input = @input + "<enddate>" + enddate + "</enddate>"
+	#interval of historical- and forecast data:
+	@input = @input + "<forecastinterval>" + interval + "</forecastinterval> <historicalinterval>" + interval + "</historicalinterval>"
+    #workloadcollection:
+	@input = @input + "<wlc>"
+	if hash != nil
+	  hash.each do |key, value|
+	    if(key != "startdate" && key != "enddate" && key != "interval")
+	      @input = @input + "<wl ts =\"" + key + "\">" + value + "</wl>"
+		end
+	  end
+	
+	  @input = @input + "</wlc> </ForecastRequest>"
+	  x = Net::HTTP.post_form(URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/'), @input)
+      puts x.body
+	end
+#	base_uri 'http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/'
+#	options = { :query => {:status => text}}
+#    self.class.post(input, options)
+  end
 
 end
