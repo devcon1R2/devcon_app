@@ -15,7 +15,7 @@ require 'nokogiri'
 
 class Forecastrequest < ActiveRecord::Base
 
-  attr_accessible :email, :startdate, :enddate, :interval, :data
+  attr_accessible :email, :startdate, :enddate, :interval, :data, :result
   
   email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
   

@@ -9,7 +9,8 @@ class ForecastrequestsController < ApplicationController
   def create
 	@forecastrequest = Forecastrequest.new(params[:forecastrequest])
 	@forecastrequest.save!
-    render 'show'
+    
+	render 'show'
   end  
   
 
