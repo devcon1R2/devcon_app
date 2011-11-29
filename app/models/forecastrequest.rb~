@@ -89,7 +89,7 @@ class Forecastrequest < ActiveRecord::Base
   end 		#def
 
 
-  def self.xml_to_hash(xml)
+  def xml_to_hash(xml)
     hash ={} 
     doc = Nokogiri::XML(xml)
     doc.xpath('//wl').each do |wl|
