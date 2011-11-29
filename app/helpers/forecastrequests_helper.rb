@@ -1,0 +1,2 @@
+module ForecastrequestsHelper
+end

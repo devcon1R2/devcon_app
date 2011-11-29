@@ -1,0 +1,30 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Email:</b>
+  <%= @forecastrequest.email %>
+</p>
+
+<p>
+  <b>Startdate:</b>
+  <%= @forecastrequest.startdate %>
+</p>
+
+<p>
+  <b>Enddate:</b>
+  <%= @forecastrequest.enddate %>
+</p>
+
+<p>
+  <b>Interval:</b>
+  <%= @forecastrequest.interval %>
+</p>
+
+<p>
+  <b>Data:</b>
+  <%= @forecastrequest.data %>
+</p>
+
+
+<%= link_to 'Edit', edit_forecastrequest_path(@forecastrequest) %> |
+<%= link_to 'Back', forecastrequests_path %>

@@ -1,0 +1,31 @@
+<h1>Listing forecastrequests</h1>
+
+<table>
+  <tr>
+    <th>Email</th>
+    <th>Startdate</th>
+    <th>Enddate</th>
+    <th>Interval</th>
+    <th>Data</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @forecastrequests.each do |forecastrequest| %>
+  <tr>
+    <td><%= forecastrequest.email %></td>
+    <td><%= forecastrequest.startdate %></td>
+    <td><%= forecastrequest.enddate %></td>
+    <td><%= forecastrequest.interval %></td>
+    <td><%= forecastrequest.data %></td>
+    <td><%= link_to 'Show', forecastrequest %></td>
+    <td><%= link_to 'Edit', edit_forecastrequest_path(forecastrequest) %></td>
+    <td><%= link_to 'Destroy', forecastrequest, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Forecastrequest', new_forecastrequest_path %>

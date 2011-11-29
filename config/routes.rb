@@ -1,4 +1,6 @@
 DevconApp::Application.routes.draw do
+  resources :forecastrequests
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
