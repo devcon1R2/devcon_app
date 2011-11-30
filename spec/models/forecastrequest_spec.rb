@@ -102,6 +102,19 @@ describe Forecastrequest do
         csv = Forecastrequest.hash_to_csv(hash)
         csv.should == "date1,55\ndate2,56\n"
     end
+
+    it "should convert correct data with own parser" do
+        data = '<?xml><Forecast><wlc><wl ts="2011-01-01T00:00:00Z">17.8</wl></wlc></Forecast>'
+        csv = Forecastrequest.ownxmlparser(data)
+        csv.should == "2011-01-01T00:00:00Z\t17.8\n"
+    end
+
+	it "should not convert incorrect data with own parser" do
+        data = "404 Bad Request"
+        csv = Forecastrequest.ownxmlparser(data)
+        csv.should == data
+    end
+
     
   end
 
