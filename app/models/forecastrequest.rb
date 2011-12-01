@@ -35,19 +35,18 @@ class Forecastrequest < ActiveRecord::Base
   
   
   def make_hash
-    mydata = self.data
-	mydata.gsub!("\r","")
-	mydata.gsub!("\t",",")
+    return nil if !(self.data) 
+	mydata = self.data.gsub("\r","").gsub("\t",",")
 	dataarray = mydata.split("\n")
     datahash = {}
     dataarray.each do |workload|
       wl = workload.split(',')
       datahash[wl[0]] = wl[1]
     end
-    { :startdate  => self.startdate.strftime("%Y-%m-%dT%H:%M:%SZ"),
-      :enddate    => self.enddate.strftime("%Y-%m-%dT%H:%M:%SZ"),
-      :interval   => self.interval.to_s,
-      :wlc        => datahash }
+    return { :startdate  => self.startdate.strftime("%Y-%m-%dT%H:%M:%SZ"),
+             :enddate    => self.enddate.strftime("%Y-%m-%dT%H:%M:%SZ"),
+             :interval   => self.interval.to_s,
+             :wlc        => datahash }
   end
  
   
@@ -56,12 +55,10 @@ class Forecastrequest < ActiveRecord::Base
     res = getforecast
     if res == nil
       self.result = "Invalid input!"
-    #elsif res == Net::HTTPSuccess
-	  #hash = Forecastrequest.xml_to_hash(res.body)
-      #self.result = hash #Forecastrequest.hash_to_csv(hash)
+#    elsif res == Net::HTTPSuccess
 	else
-      self.result = Forecastrequest.ownxmlparser(res.body)
-    #  self.result += res.body
+	  self.result = Forecastrequest.hash_to_csv(Forecastrequest.xml_to_hash(res.body))
+     # self.result += res.body if !self.result
     end
   end
  
@@ -84,27 +81,22 @@ class Forecastrequest < ActiveRecord::Base
 	return nil
   end 		#def
 
-  #As the xml parser seems to have problems, own xml parser is used as a workaround
-  def  self.ownxmlparser(xmlstr)
-    if xmlstr.index("<wlc")
-	  return xmlstr.slice(xmlstr.index("<wlc")+5,xmlstr.length).gsub('</wlc></Forecast>',"").gsub('<wl ts="',"").gsub('">',"\t").gsub('</wl>',"\n")
-    else  
-	  return xmlstr
-	end#if  
-  end#def
   
 
   def self.xml_to_hash(xml)
-    hash ={} 
+    return nil if !xml
+	hash ={} 
     doc = Nokogiri::XML(xml)
-    doc.xpath('//wl').each do |wl|
+    doc.remove_namespaces!
+	doc.xpath('//wl').each do |wl|
       hash["#{wl.attribute('ts')}"] = "#{wl.content}"
     end
     return hash
   end
 
   def self.hash_to_csv(hash)
-    csv = ""
+    return nil if !hash
+	csv = ""
     hash.each do |key, value| 
       csv << "#{key},#{value}\n"
     end
@@ -127,9 +119,7 @@ class Forecastrequest < ActiveRecord::Base
 	@input = @input + "<wlc>"
 	
 	hash[:wlc].each do |key, value|
-#	  if(key != :startdate && key != :enddate && key != :interval)
-	    @input = @input + "<wl ts =\"" + key + "\">" + value + "</wl>"
-#	  end
+      @input = @input + "<wl ts =\"" + key + "\">" + value + "</wl>"
 	end
 	@input = @input + "</wlc> </ForecastRequest>"
 	return @input
