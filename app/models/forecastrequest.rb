@@ -17,6 +17,8 @@ require 'nokogiri'
 
 class Forecastrequest < ActiveRecord::Base
 
+  PE_URL = 'http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/'
+
   attr_accessible :email, :startdate, :enddate, :interval, :data, :result
   
   email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
@@ -66,13 +68,13 @@ class Forecastrequest < ActiveRecord::Base
   def getforecast
     hash = make_hash
 	if hash != nil
-	  url = URI.parse('http://testcloud.injixo.com/PredictionEngine/PredictionEngine.svc/')
-      req = Net::HTTP::Post.new(url.path)
-      req['Accept'] = "text/xml"
-      req['Content-Type'] = "text/xml"
-	  req.body = self.inputcreator(hash)
+	  url = URI.parse(PE_URL)
+      request = Net::HTTP::Post.new(url.path)
+      request['Accept'] = "text/xml"
+      request['Content-Type'] = "text/xml"
+	  request.body = self.inputcreator(hash)
 	  res = Net::HTTP.start(url.host, url.port) { |http|
-      http.request(req)
+      http.request(request)
       }
 	  #puts "OUTPUT"
       #puts res.body
@@ -97,14 +99,31 @@ class Forecastrequest < ActiveRecord::Base
   def self.hash_to_csv(hash)
     return nil if !hash
 	csv = ""
-    hash.each do |key, value| 
-      csv << "#{key},#{value}\n"
+
+    hash.keys.sort{|x,y| x <=> y}.each do |key| 
+      csv << "#{key},#{hash[key]}\n"
     end
     return csv
   end
   
   
+  def getDailyValues(csv)
+    return [] unless self && csv
+	timeframe = ((self.enddate - self.startdate) / 86400).to_i
+	timeframe = 100 if timeframe > 100
+	daily = Array.new(timeframe)
+	csv.split("\n").each {|l|
+	  ks,v = l.split(",")
+	  k = Time.zone.parse(ks)
+	  d = ((k - self.startdate) / 86400).to_i
+	  if d <= timeframe
+	    daily[d] = !daily[d] ? v.to_i : daily[d] + v.to_i
+	  end
+	}
+	
+    return daily
 
+  end
 
 
   def inputcreator(hash)

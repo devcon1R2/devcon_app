@@ -1,1 +1,21 @@
-<p>  <b>Result:</b><br />  <textarea rows=15 cols=32><%=@forecastrequest.result%></textarea><br />  <a href="mailto:<%=@forecastrequest.email%>?subject='Forecast created from <%=@forecastrequest.startdate%> to <%=@forecastrequest.enddate%>'&body=<%=CGI.escape((@forecastrequest.result || " "))%>">Send to email address</a>  </p>
+   <script type="text/javascript">
+    /* <![CDATA[ */
+    $(function() {
+        /* This code runs when everything has been loaded on the page */
+        /* Inline sparklines take their values from the contents of the tag */
+
+		 // Customized line chart
+        $('.linecustom').sparkline('html', {height: '100px', width: '250px', minSpotColor: false, maxSpotColor: false, spotColor: '#77f', spotRadius: 3});
+		
+    });
+    /* ]]> */
+    </script>
+
+<p>
+  <b>Result:</b><br />
+  <textarea rows=15 cols=32><%=@forecastrequest.result %></textarea><br />
+  <a href="mailto:<%=@forecastrequest.email%>?subject='Forecast created from <%=@forecastrequest.startdate%> to <%=@forecastrequest.enddate%>'&body='Forecast is available at ID <%=@forecastrequest.id%>'">Send to email address</a>
+  </p>
+
+  <b>Result graph (Daily sums):</b><br />
+ <div class="linecustom"><%= @forecastrequest.getDailyValues(@forecastrequest.result).join(",") %></div>
